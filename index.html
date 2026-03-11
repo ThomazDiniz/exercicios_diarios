@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minha Rotina de Treino</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>Rotina de Treino</h1>
+      <p class="subtitle">Peito • Pernas • Costas • Cardio</p>
+      <div class="day-tabs" role="tablist">
+        <button type="button" class="tab active" data-treino="A" aria-selected="true">Treino A — Peito & Tríceps</button>
+        <button type="button" class="tab" data-treino="B" aria-selected="false">Treino B — Pernas</button>
+        <button type="button" class="tab" data-treino="C" aria-selected="false">Treino C — Costas & Ombros</button>
+        <button type="button" class="tab" data-treino="cardio" aria-selected="false">Cardio</button>
+      </div>
+    </header>
+
+    <main class="main">
+      <section id="treino-A" class="treino-panel active" aria-hidden="false">
+        <h2>Treino A — Peito e Tríceps</h2>
+        <div id="exercises-A" class="exercises-grid"></div>
+      </section>
+      <section id="treino-B" class="treino-panel" aria-hidden="true">
+        <h2>Treino B — Pernas e Posterior</h2>
+        <div id="exercises-B" class="exercises-grid"></div>
+      </section>
+      <section id="treino-C" class="treino-panel" aria-hidden="true">
+        <h2>Treino C — Costas, Bíceps e Ombros</h2>
+        <div id="exercises-C" class="exercises-grid"></div>
+      </section>
+      <section id="treino-cardio" class="treino-panel" aria-hidden="true">
+        <h2>Cardio — Corrida ou Bike</h2>
+        <div id="exercises-cardio" class="exercises-grid"></div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <button type="button" id="reset-day" class="btn-reset">Limpar checklist do dia</button>
+      <p class="hint">Seu progresso é salvo automaticamente no navegador.</p>
+    </footer>
+  </div>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
