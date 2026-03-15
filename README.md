@@ -2,7 +2,7 @@
 
 App simples para acompanhar a rotina de treino (Treino A, B, C e Cardio), com checklist por exercício, imagens e vídeos de correção.
 
-**Página:** [GitHub Pages](https://tumais.github.io/Daily-Exercises/)
+**Repositório:** [GitHub](https://github.com/ThomazDiniz/exercicios_diarios) · **Página:** [GitHub Pages](https://thomazdiniz.github.io/exercicios_diarios/)
 
 ## Estrutura
 
