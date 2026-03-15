@@ -2,6 +2,8 @@
 
 App simples para acompanhar a rotina de treino (Treino A, B, C e Cardio), com checklist por exercício, imagens e vídeos de correção.
 
+**Página:** [GitHub Pages](https://tumais.github.io/Daily-Exercises/)
+
 ## Estrutura
 
 - **Treino A** — Peito e Tríceps  
