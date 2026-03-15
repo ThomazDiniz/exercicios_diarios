@@ -13,13 +13,16 @@
   <div class="app">
     <header class="header">
       <h1>Rotina de Treino</h1>
-      <p class="subtitle">Peito • Pernas • Costas • Cardio</p>
       <div class="day-tabs" role="tablist">
         <button type="button" class="tab active" data-treino="A" aria-selected="true">Treino A — Peito & Tríceps</button>
         <button type="button" class="tab" data-treino="B" aria-selected="false">Treino B — Pernas</button>
         <button type="button" class="tab" data-treino="C" aria-selected="false">Treino C — Costas & Ombros</button>
         <button type="button" class="tab" data-treino="cardio" aria-selected="false">Cardio</button>
       </div>
+      <section class="videos-legais" id="videos-legais" aria-label="Dicas">
+        <h2 class="videos-legais-title">Dicas</h2>
+        <div class="videos-legais-grid" id="videos-legais-grid"></div>
+      </section>
     </header>
 
     <main class="main">
@@ -42,9 +45,19 @@
     </main>
 
     <footer class="footer">
-      <button type="button" id="reset-day" class="btn-reset">Limpar checklist do dia</button>
-      <p class="hint">Seu progresso é salvo automaticamente no navegador.</p>
+      <button type="button" id="reset-day" class="btn-reset">Reiniciar treino do dia</button>
+      <p class="hint">Progresso salvo só até o fim do dia. <kbd>Enter</kbd> marca o próximo; <kbd>Backspace</kbd> ou <kbd>Z</kbd> desmarca o último.</p>
     </footer>
+  </div>
+  <div id="image-zoom-overlay" class="image-zoom-overlay" aria-hidden="true">
+    <img src="" alt="" class="image-zoom-img">
+  </div>
+  <div id="video-overlay" class="video-overlay" aria-hidden="true">
+    <div class="video-overlay-inner">
+      <button type="button" class="video-overlay-close" id="video-overlay-close" aria-label="Fechar vídeo">×</button>
+      <p class="video-overlay-title" id="video-overlay-title"></p>
+      <div class="video-overlay-player" id="video-overlay-player"></div>
+    </div>
   </div>
   <script src="data.js"></script>
   <script src="app.js"></script>

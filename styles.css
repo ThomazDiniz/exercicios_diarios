@@ -37,7 +37,7 @@ body {
 }
 
 /* ---- Header e abas ---- */
-.header { margin-bottom: 1.5rem; }
+.header { margin-bottom: 1.5rem; text-align: center; }
 .header h1 {
   font-size: 1.75rem;
   font-weight: 700;
@@ -49,7 +49,7 @@ body {
   font-size: 0.95rem;
   margin: 0 0 1.25rem 0;
 }
-.day-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.day-tabs { display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center; }
 .tab {
   font-family: var(--font);
   font-size: 0.875rem;
@@ -73,6 +73,39 @@ body {
   color: var(--bg);
 }
 .tab[aria-selected="true"] { font-weight: 700; }
+
+/* ---- Dicas (vídeos ao iniciar) ---- */
+.videos-legais {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.videos-legais-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin: 0 0 0.75rem 0;
+}
+.videos-legais-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+.video-legal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+.video-legal-thumb {
+  width: 200px;
+  aspect-ratio: 16 / 9;
+  flex-shrink: 0;
+}
+.video-legal-thumb-title {
+  max-width: 200px;
+  margin: 0;
+}
 
 /* ---- Painéis ---- */
 .main { flex: 1; }
@@ -155,6 +188,19 @@ body {
   color: var(--accent);
   margin-bottom: 0.25rem;
 }
+.exercise-nome-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+}
+.exercise-nome-wrap .exercise-nome {
+  margin: 0;
+}
+.exercise-nome-wrap .btn-youtube-icon {
+  padding: 0.35rem 0.45rem;
+  flex-shrink: 0;
+}
 .exercise-nome {
   font-size: 1.05rem;
   font-weight: 600;
@@ -188,11 +234,91 @@ body {
   cursor: pointer;
 }
 
+.video-dica-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+}
+.video-dica-wrap-inline {
+  flex-shrink: 0;
+  align-items: flex-end;
+}
+.video-dica-wrap-inline .video-dica-thumb {
+  width: 140px;
+  height: 79px;
+  aspect-ratio: 16 / 9;
+}
+.video-dica-wrap-inline .video-dica-play-icon {
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 0.75rem;
+}
+.video-dica-wrap-inline .video-dica-title {
+  font-size: 0.7rem;
+  max-width: 140px;
+  text-align: right;
+}
+.video-dica-thumb {
+  position: relative;
+  display: block;
+  width: 200px;
+  aspect-ratio: 16 / 9;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface-2);
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.video-dica-thumb:hover {
+  border-color: var(--accent);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+.video-dica-thumb:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+.video-dica-thumb-preview {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.video-dica-play-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  pointer-events: none;
+}
+.video-dica-title {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin: 0;
+  max-width: 200px;
+  line-height: 1.3;
+}
 .btn-youtube {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
-  margin: 0 1rem 1rem 1rem;
   padding: 0.5rem 1rem;
   font-size: 0.9rem;
   font-weight: 600;
@@ -203,9 +329,18 @@ body {
   text-decoration: none;
   transition: background 0.2s, color 0.2s;
 }
+.btn-youtube-icon {
+  padding: 0.5rem 0.65rem;
+}
+.btn-youtube svg {
+  flex-shrink: 0;
+}
 .btn-youtube:hover {
   background: var(--accent);
   color: var(--bg);
+}
+.btn-youtube:hover svg {
+  stroke: currentColor;
 }
 .btn-youtube:focus-visible {
   outline: 2px solid var(--accent);
@@ -239,6 +374,15 @@ body {
   color: var(--text-muted);
   margin: 0.75rem 0 0 0;
 }
+.hint kbd {
+  display: inline-block;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+  font-family: var(--font-mono);
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
 
 @media (max-width: 640px) {
   .exercise-card-header { flex-wrap: wrap; }
@@ -247,5 +391,110 @@ body {
     height: 220px;
   }
   .check-wrap { width: 100%; }
-  .btn-youtube { margin-left: 1rem; margin-right: 1rem; }
+  .video-dica-wrap-inline { align-self: flex-end; }
+}
+
+/* ---- Overlay zoom ao passar o mouse ---- */
+.image-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.88);
+  padding: 1rem;
+  cursor: default;
+}
+.image-zoom-overlay.visible {
+  display: flex;
+}
+.image-zoom-overlay .image-zoom-img {
+  width: 800px;
+  height: auto;
+  max-width: min(800px, 95vw);
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+}
+.image-zoom-overlay {
+  cursor: pointer;
+}
+.exercise-thumb-wrap {
+  cursor: zoom-in;
+}
+
+/* ---- Overlay vídeo de correção ---- */
+.video-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.9);
+  padding: 1rem;
+  cursor: default;
+}
+.video-overlay.visible {
+  display: flex;
+}
+.video-overlay-inner {
+  position: relative;
+  width: 1000px;
+  max-width: 100%;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  cursor: default;
+}
+.video-overlay-close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.75rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  z-index: 1;
+}
+.video-overlay-close:hover {
+  color: var(--text);
+  background: var(--surface-2);
+}
+.video-overlay-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 0.75rem 0;
+  padding-right: 2.5rem;
+}
+.video-overlay-player {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: var(--bg);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.video-overlay-iframe,
+.video-overlay-html5 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+.video-overlay-html5 {
+  object-fit: contain;
 }
