@@ -89,6 +89,7 @@
       cb.addEventListener('change', function () {
         card.classList.toggle('done', this.checked);
         saveDoneState();
+        showCongratsIfDone();
       });
     }
 
@@ -288,6 +289,35 @@
     return 'C';
   }
 
+  function isAllDoneInActivePanel() {
+    var panel = document.querySelector('.treino-panel.active');
+    if (!panel) return false;
+    var cards = panel.querySelectorAll('.exercise-card');
+    if (!cards.length) return false;
+    for (var i = 0; i < cards.length; i++) {
+      if (!cards[i].classList.contains('done')) return false;
+    }
+    return true;
+  }
+
+  function showCongratsIfDone() {
+    if (isAllDoneInActivePanel()) {
+      var overlay = document.getElementById('congrats-overlay');
+      if (overlay) {
+        overlay.classList.add('visible');
+        overlay.setAttribute('aria-hidden', 'false');
+      }
+    }
+  }
+
+  function closeCongrats() {
+    var overlay = document.getElementById('congrats-overlay');
+    if (overlay) {
+      overlay.classList.remove('visible');
+      overlay.setAttribute('aria-hidden', 'true');
+    }
+  }
+
   function init() {
     ['A', 'B', 'C', 'cardio'].forEach(renderTreino);
     switchPanel(getTreinoDoDia());
@@ -311,6 +341,17 @@
     }
     if (videoOverlayClose) {
       videoOverlayClose.addEventListener('click', closeVideoOverlay);
+    }
+
+    var congratsOverlay = document.getElementById('congrats-overlay');
+    var congratsClose = document.getElementById('congrats-close');
+    if (congratsOverlay) {
+      congratsOverlay.addEventListener('click', function (e) {
+        if (e.target === congratsOverlay) closeCongrats();
+      });
+    }
+    if (congratsClose) {
+      congratsClose.addEventListener('click', closeCongrats);
     }
 
     document.querySelectorAll('.tab').forEach(function (tab) {
@@ -346,6 +387,7 @@
           cb.checked = true;
           first.classList.add('done');
           saveDoneState();
+          showCongratsIfDone();
         }
         return;
       }

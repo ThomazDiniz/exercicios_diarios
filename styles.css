@@ -498,3 +498,54 @@ body {
 .video-overlay-html5 {
   object-fit: contain;
 }
+
+/* ---- Overlay parabéns (treino do dia concluído) ---- */
+.congrats-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.75);
+  padding: 1rem;
+}
+.congrats-overlay.visible {
+  display: flex;
+}
+.congrats-inner {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius);
+  padding: 2rem;
+  max-width: 360px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+.congrats-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 0.5rem 0;
+}
+.congrats-text {
+  font-size: 1rem;
+  color: var(--text);
+  margin: 0 0 1.25rem 0;
+  line-height: 1.4;
+}
+.congrats-close {
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.5rem 1.25rem;
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.congrats-close:hover {
+  background: var(--accent-hover);
+}
