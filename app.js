@@ -2,6 +2,10 @@
   'use strict';
 
   var STORAGE_KEY = 'treino-done';
+  var ORDER_KEY = 'treino-order';
+  var SELECTED_CLASS = 'selected';
+  var draggedCard = null;
+  var lastSelectionByTreino = { A: null, B: null, C: null, cardio: null };
 
   function getDateKey() {
     var d = new Date();
@@ -11,6 +15,33 @@
   function getTreinoFromId(id) {
     var i = id.indexOf('-');
     return i >= 0 ? id.slice(0, i) : id;
+  }
+
+  function loadOrder() {
+    try {
+      var raw = localStorage.getItem(ORDER_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function saveOrder(data) {
+    try {
+      localStorage.setItem(ORDER_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function getOrderedList(treinoKey, list) {
+    var data = loadOrder() || {};
+    var order = Array.isArray(data[treinoKey]) ? data[treinoKey] : null;
+    if (!order || order.length === 0) return list.slice();
+
+    var map = {};
+    list.forEach(function (ex) { map[ex.id] = ex; });
+
+    var out = [];
+    order.forEach(function (id) { if (map[id]) out.push(map[id]); });
+    list.forEach(function (ex) { if (!order.includes(ex.id)) out.push(ex); });
+    return out;
   }
 
   function loadDoneState() {
@@ -58,8 +89,11 @@
     const card = document.createElement('article');
     card.className = 'exercise-card';
     card.dataset.id = ex.id;
+    card.dataset.treino = treino;
+    card.draggable = true;
     card.innerHTML =
       '<div class="exercise-card-header">' +
+        '<button type="button" class="drag-handle" aria-label="Reordenar exercício" title="Arraste para reordenar">⋮⋮</button>' +
         '<div class="exercise-thumb-wrap"><img class="exercise-thumb" src="' + imgSrc + '" alt="' + escapeHtml(ex.exercicio) + '" loading="lazy"></div>' +
         '<div class="exercise-info">' +
           '<p class="exercise-grupo">' + escapeHtml(ex.grupo) + '</p>' +
@@ -89,9 +123,58 @@
       cb.addEventListener('change', function () {
         card.classList.toggle('done', this.checked);
         saveDoneState();
+        if (this.checked) {
+          // se marcou, move seleção para o próximo disponível
+          if (card.classList.contains(SELECTED_CLASS)) {
+            selectNextAvailableInActivePanel();
+          }
+        }
         showCongratsIfDone();
       });
     }
+
+    // Seleção por clique
+    card.addEventListener('click', function (e) {
+      // evita selecionar ao clicar no checkbox/links/botões
+      var t = e.target;
+      if (t && (t.closest('a') || t.closest('button') || t.closest('label'))) return;
+      selectCard(card);
+    });
+
+    // Drag & drop: só inicia pelo handle
+    card.addEventListener('dragstart', function (e) {
+      var handle = e.target && e.target.closest && e.target.closest('.drag-handle');
+      if (!handle) {
+        e.preventDefault();
+        return;
+      }
+      draggedCard = card;
+      try { e.dataTransfer.setData('text/plain', card.dataset.id || ''); } catch (err) {}
+      e.dataTransfer.effectAllowed = 'move';
+      card.classList.add('dragging');
+    });
+    card.addEventListener('dragend', function () {
+      card.classList.remove('dragging');
+      draggedCard = null;
+    });
+    card.addEventListener('dragover', function (e) {
+      if (!draggedCard || draggedCard === card) return;
+      if (card.classList.contains('done') || draggedCard.classList.contains('done')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    card.addEventListener('drop', function (e) {
+      if (!draggedCard || draggedCard === card) return;
+      if (card.classList.contains('done') || draggedCard.classList.contains('done')) return;
+      e.preventDefault();
+      var parent = card.parentElement;
+      if (!parent) return;
+      // insere o dragged antes/depois baseado no mouse
+      var rect = card.getBoundingClientRect();
+      var before = e.clientY < rect.top + rect.height / 2;
+      parent.insertBefore(draggedCard, before ? card : card.nextSibling);
+      persistOrderForTreino(draggedCard.dataset.treino, parent);
+    });
 
     var wrap = card.querySelector('.exercise-thumb-wrap');
     var thumb = wrap && wrap.querySelector('.exercise-thumb');
@@ -255,12 +338,106 @@
     return div.innerHTML;
   }
 
+  function clearSelection(panel) {
+    if (!panel) return;
+    panel.querySelectorAll('.exercise-card.' + SELECTED_CLASS).forEach(function (c) {
+      c.classList.remove(SELECTED_CLASS);
+    });
+  }
+
+  function getActiveTreinoKey() {
+    var panel = document.querySelector('.treino-panel.active');
+    if (!panel) return null;
+    var id = panel.id;
+    return id === 'treino-cardio' ? 'cardio' : id.replace('treino-', '');
+  }
+
+  function getSelectableCards(panel) {
+    return Array.prototype.slice.call(panel.querySelectorAll('.exercise-card:not(.done)'));
+  }
+
+  function ensureSelectionInActivePanel() {
+    var panel = document.querySelector('.treino-panel.active');
+    if (!panel) return;
+    var treinoKey = getActiveTreinoKey();
+    var cards = getSelectableCards(panel);
+    if (cards.length === 0) {
+      clearSelection(panel);
+      return;
+    }
+    var wantedId = treinoKey && lastSelectionByTreino[treinoKey];
+    var chosen = wantedId ? panel.querySelector('.exercise-card[data-id="' + wantedId + '"]:not(.done)') : null;
+    if (!chosen) chosen = cards[0];
+    selectCard(chosen);
+  }
+
+  function selectCard(card) {
+    if (!card || card.classList.contains('done')) return;
+    var panel = card.closest('.treino-panel');
+    if (!panel) return;
+    clearSelection(panel);
+    card.classList.add(SELECTED_CLASS);
+    var treinoKey = getActiveTreinoKey();
+    if (treinoKey) lastSelectionByTreino[treinoKey] = card.dataset.id || null;
+    try { card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+  }
+
+  function moveSelection(delta) {
+    var panel = document.querySelector('.treino-panel.active');
+    if (!panel) return;
+    var cards = getSelectableCards(panel);
+    if (cards.length === 0) return;
+    var current = panel.querySelector('.exercise-card.' + SELECTED_CLASS);
+    var idx = current ? cards.indexOf(current) : -1;
+    var next = idx < 0 ? cards[0] : cards[Math.max(0, Math.min(cards.length - 1, idx + delta))];
+    selectCard(next);
+  }
+
+  function selectNextAvailableInActivePanel() {
+    var panel = document.querySelector('.treino-panel.active');
+    if (!panel) return;
+    var cards = getSelectableCards(panel);
+    if (cards.length === 0) return;
+    selectCard(cards[0]);
+  }
+
+  function markSelectedDone() {
+    var panel = document.querySelector('.treino-panel.active');
+    if (!panel) return;
+    var current = panel.querySelector('.exercise-card.' + SELECTED_CLASS);
+    if (!current) {
+      ensureSelectionInActivePanel();
+      current = panel.querySelector('.exercise-card.' + SELECTED_CLASS);
+    }
+    if (!current) return;
+    var cb = current.querySelector('input[type="checkbox"]');
+    if (cb) {
+      cb.checked = true;
+      current.classList.add('done');
+      saveDoneState();
+      showCongratsIfDone();
+      selectNextAvailableInActivePanel();
+    }
+  }
+
+  function persistOrderForTreino(treinoKey, container) {
+    if (!treinoKey || !container) return;
+    var ids = [];
+    container.querySelectorAll('.exercise-card').forEach(function (card) {
+      if (card.dataset && card.dataset.id) ids.push(card.dataset.id);
+    });
+    var data = loadOrder() || {};
+    data[treinoKey] = ids;
+    saveOrder(data);
+  }
+
   function renderTreino(treinoKey) {
     const list = ROTINA[treinoKey];
     const container = document.getElementById('exercises-' + treinoKey);
     if (!list || !container) return;
     container.innerHTML = '';
-    list.forEach(function (ex) {
+    var ordered = getOrderedList(treinoKey, list);
+    ordered.forEach(function (ex) {
       container.appendChild(renderExercise(treinoKey, ex));
     });
   }
@@ -323,6 +500,7 @@
     switchPanel(getTreinoDoDia());
     applySavedState();
     renderVideosLegais();
+    ensureSelectionInActivePanel();
 
     var overlay = document.getElementById('image-zoom-overlay');
     if (overlay) {
@@ -357,6 +535,7 @@
     document.querySelectorAll('.tab').forEach(function (tab) {
       tab.addEventListener('click', function () {
         switchPanel(this.getAttribute('data-treino'));
+        ensureSelectionInActivePanel();
       });
     });
 
@@ -378,17 +557,21 @@
       var panel = document.querySelector('.treino-panel.active');
       if (!panel) return;
 
-      if (e.key === 'Enter') {
-        var first = panel.querySelector('.exercise-card:not(.done)');
-        if (!first) return;
+      if (e.key === 'ArrowDown') {
         e.preventDefault();
-        var cb = first.querySelector('input[type="checkbox"]');
-        if (cb) {
-          cb.checked = true;
-          first.classList.add('done');
-          saveDoneState();
-          showCongratsIfDone();
-        }
+        moveSelection(1);
+        return;
+      }
+
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        moveSelection(-1);
+        return;
+      }
+
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        markSelectedDone();
         return;
       }
 
@@ -402,6 +585,8 @@
           lastCb.checked = false;
           last.classList.remove('done');
           saveDoneState();
+          // ao desfazer, seleciona o item reaberto
+          selectCard(last);
         }
       }
     });
