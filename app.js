@@ -93,8 +93,8 @@
     card.draggable = true;
     card.innerHTML =
       '<div class="exercise-card-header">' +
-        '<button type="button" class="drag-handle" aria-label="Reordenar exercício" title="Arraste para reordenar">⋮⋮</button>' +
-        '<div class="exercise-thumb-wrap"><img class="exercise-thumb" src="' + imgSrc + '" alt="' + escapeHtml(ex.exercicio) + '" loading="lazy"></div>' +
+        '<div class="drag-handle" draggable="false" role="button" tabindex="0" aria-label="Reordenar exercício" title="Arraste para reordenar">⋮⋮</div>' +
+        '<div class="exercise-thumb-wrap"><img class="exercise-thumb" src="' + imgSrc + '" alt="' + escapeHtml(ex.exercicio) + '" loading="lazy" draggable="false"></div>' +
         '<div class="exercise-info">' +
           '<p class="exercise-grupo">' + escapeHtml(ex.grupo) + '</p>' +
           '<div class="exercise-nome-wrap">' +
@@ -137,7 +137,7 @@
     card.addEventListener('click', function (e) {
       // evita selecionar ao clicar no checkbox/links/botões
       var t = e.target;
-      if (t && (t.closest('a') || t.closest('button') || t.closest('label'))) return;
+      if (t && (t.closest('a') || t.closest('button') || t.closest('label') || t.closest('.drag-handle'))) return;
       selectCard(card);
     });
 
@@ -431,6 +431,25 @@
     saveOrder(data);
   }
 
+  /** Permite soltar no grid (áreas vazias) e mantém dragover válido em toda a lista. */
+  function bindGridDragZone(container, treinoKey) {
+    if (!container) return;
+    container.addEventListener('dragover', function (e) {
+      if (!draggedCard || draggedCard.dataset.treino !== treinoKey) return;
+      if (draggedCard.classList.contains('done')) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+    container.addEventListener('drop', function (e) {
+      if (!draggedCard || draggedCard.dataset.treino !== treinoKey) return;
+      if (draggedCard.classList.contains('done')) return;
+      if (e.target !== container) return;
+      e.preventDefault();
+      container.appendChild(draggedCard);
+      persistOrderForTreino(treinoKey, container);
+    });
+  }
+
   function renderTreino(treinoKey) {
     const list = ROTINA[treinoKey];
     const container = document.getElementById('exercises-' + treinoKey);
@@ -440,6 +459,7 @@
     ordered.forEach(function (ex) {
       container.appendChild(renderExercise(treinoKey, ex));
     });
+    bindGridDragZone(container, treinoKey);
   }
 
   function switchPanel(activeKey) {
