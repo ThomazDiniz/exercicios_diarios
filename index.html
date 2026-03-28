@@ -60,10 +60,15 @@
     </div>
   </div>
   <div id="congrats-overlay" class="congrats-overlay" aria-hidden="true">
-    <div class="congrats-inner">
-      <p class="congrats-title">Parabéns!</p>
-      <p class="congrats-text">Você concluiu todas as atividades do dia.</p>
-      <button type="button" class="congrats-close" id="congrats-close">Fechar</button>
+    <div class="congrats-inner" role="alertdialog" aria-live="polite" aria-labelledby="congrats-title" aria-describedby="congrats-desc">
+      <div class="congrats-timer-wrap" aria-hidden="true">
+        <svg class="congrats-timer" viewBox="0 0 36 36" width="52" height="52">
+          <circle class="congrats-timer-bg" cx="18" cy="18" r="15" fill="none"></circle>
+          <circle class="congrats-timer-progress" cx="18" cy="18" r="15" fill="none"></circle>
+        </svg>
+      </div>
+      <p class="congrats-title" id="congrats-title">Parabéns!</p>
+      <p class="congrats-text" id="congrats-desc">Você concluiu todas as atividades do dia.</p>
     </div>
   </div>
   <script src="data.js"></script>

@@ -6,6 +6,8 @@
   var SELECTED_CLASS = 'selected';
   var draggedCard = null;
   var lastSelectionByTreino = { A: null, B: null, C: null, cardio: null };
+  var congratsCloseTimer = null;
+  var CONGRATS_MS = 3000;
 
   function getDateKey() {
     var d = new Date();
@@ -498,17 +500,36 @@
   }
 
   function showCongratsIfDone() {
-    if (isAllDoneInActivePanel()) {
-      var overlay = document.getElementById('congrats-overlay');
-      if (overlay) {
-        overlay.classList.add('visible');
-        overlay.setAttribute('aria-hidden', 'false');
-      }
+    if (!isAllDoneInActivePanel()) return;
+    var overlay = document.getElementById('congrats-overlay');
+    var ring = document.querySelector('.congrats-timer-progress');
+    if (!overlay) return;
+    if (congratsCloseTimer) {
+      clearTimeout(congratsCloseTimer);
+      congratsCloseTimer = null;
     }
+    overlay.classList.add('visible');
+    overlay.setAttribute('aria-hidden', 'false');
+    if (ring) {
+      ring.style.setProperty('--congrats-dur', CONGRATS_MS + 'ms');
+      ring.classList.remove('congrats-timer-animate');
+      void ring.offsetWidth;
+      ring.classList.add('congrats-timer-animate');
+    }
+    congratsCloseTimer = setTimeout(function () {
+      congratsCloseTimer = null;
+      closeCongrats();
+    }, CONGRATS_MS);
   }
 
   function closeCongrats() {
+    if (congratsCloseTimer) {
+      clearTimeout(congratsCloseTimer);
+      congratsCloseTimer = null;
+    }
     var overlay = document.getElementById('congrats-overlay');
+    var ring = document.querySelector('.congrats-timer-progress');
+    if (ring) ring.classList.remove('congrats-timer-animate');
     if (overlay) {
       overlay.classList.remove('visible');
       overlay.setAttribute('aria-hidden', 'true');
@@ -542,14 +563,10 @@
     }
 
     var congratsOverlay = document.getElementById('congrats-overlay');
-    var congratsClose = document.getElementById('congrats-close');
     if (congratsOverlay) {
       congratsOverlay.addEventListener('click', function (e) {
         if (e.target === congratsOverlay) closeCongrats();
       });
-    }
-    if (congratsClose) {
-      congratsClose.addEventListener('click', closeCongrats);
     }
 
     document.querySelectorAll('.tab').forEach(function (tab) {

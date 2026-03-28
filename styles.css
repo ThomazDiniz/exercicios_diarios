@@ -532,7 +532,7 @@ body {
   object-fit: contain;
 }
 
-/* ---- Overlay parabéns (treino do dia concluído) ---- */
+/* ---- Popup parabéns (treino do dia concluído) — fecha em 3s + timer radial ---- */
 .congrats-overlay {
   position: fixed;
   inset: 0;
@@ -540,7 +540,7 @@ body {
   display: none;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(0, 0, 0, 0.55);
   padding: 1rem;
 }
 .congrats-overlay.visible {
@@ -550,35 +550,57 @@ body {
   background: var(--surface);
   border: 1px solid var(--accent);
   border-radius: var(--radius);
-  padding: 2rem;
-  max-width: 360px;
+  padding: 1.35rem 1.5rem 1.5rem;
+  max-width: 320px;
   text-align: center;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  pointer-events: auto;
+}
+.congrats-timer-wrap {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.85rem;
+}
+.congrats-timer {
+  display: block;
+}
+.congrats-timer-bg {
+  stroke: var(--border);
+  stroke-width: 2.25;
+}
+/* 2 * pi * 15 */
+.congrats-timer-progress {
+  stroke: var(--accent);
+  stroke-width: 2.25;
+  stroke-linecap: round;
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  stroke-dasharray: 94.248;
+  stroke-dashoffset: 0;
+}
+.congrats-timer-progress.congrats-timer-animate {
+  animation: congrats-radial var(--congrats-dur, 3s) linear forwards;
+}
+@keyframes congrats-radial {
+  to {
+    stroke-dashoffset: 94.248;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .congrats-timer-progress.congrats-timer-animate {
+    animation: none;
+    opacity: 0.45;
+  }
 }
 .congrats-title {
-  font-size: 1.5rem;
+  font-size: 1.35rem;
   font-weight: 700;
   color: var(--accent);
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 0.35rem 0;
 }
 .congrats-text {
-  font-size: 1rem;
-  color: var(--text);
-  margin: 0 0 1.25rem 0;
-  line-height: 1.4;
-}
-.congrats-close {
-  font-family: var(--font);
   font-size: 0.95rem;
-  font-weight: 600;
-  padding: 0.5rem 1.25rem;
-  background: var(--accent);
-  color: var(--bg);
-  border: none;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.congrats-close:hover {
-  background: var(--accent-hover);
+  color: var(--text);
+  margin: 0;
+  line-height: 1.4;
 }
