@@ -5,6 +5,7 @@
  */
 const ROTINA = {
   A: [
+    { id: 'A-alongamento', grupo: 'Alongamento', exercicio: 'Alongamento', equipamento: 'Sem equipamento', observacoes: 'Faça um aquecimento leve e alongue sem dor. Respire fundo e mantenha 20–30s cada posição.', imagem: 'https://www.soufisio.com.br/wp-content/uploads/2018/06/alongamentos-dicas.png', video: null, pinnedFirst: true },
     { id: 'A-1', grupo: 'Peito', exercicio: 'Flexão de braços', equipamento: 'Peso corporal', observacoes: 'Corpo alinhado, cotovelos não abrem demais. Para dificultar: pés elevados ou mãos fechadas.', imagem: 'images/flexao-bracos.gif', video: null },
     { id: 'A-2', grupo: 'Peito', exercicio: 'Supino no chão com halteres', equipamento: 'Halteres e colchonete', observacoes: 'Omoplatas levemente encaixadas. Desça até os cotovelos formarem ~90°.', imagem: 'images/supino-chao.gif', video: null },
     { id: 'A-4', grupo: 'Peito', exercicio: 'Crucifixo com halteres', equipamento: 'Elástico ou halteres', observacoes: 'Braços levemente flexionados. Abra até sentir alongamento no peito, sem forçar o ombro.', imagem: 'images/crucifixo.gif', video: null },
@@ -15,6 +16,7 @@ const ROTINA = {
     { id: 'A-prancha', grupo: 'Core', exercicio: 'Prancha', equipamento: 'Colchonete', observacoes: 'Cabeça, quadril e tornozelos alinhados. Contraia o abdômen e não deixe o quadril subir ou cair.', imagem: 'https://cdn.atletis.com.br/atletis-website/base/82e/95c/164/abdominal-prancha-frontal.png', video: 'videos/Prancha Correção.webm' },
   ],
   B: [
+    { id: 'B-alongamento', grupo: 'Alongamento', exercicio: 'Alongamento', equipamento: 'Sem equipamento', observacoes: 'Faça um aquecimento leve e alongue sem dor. Respire fundo e mantenha 20–30s cada posição.', imagem: 'https://www.soufisio.com.br/wp-content/uploads/2018/06/alongamentos-dicas.png', video: null, pinnedFirst: true },
     { id: 'B-1', grupo: 'Pernas', exercicio: 'Agachamento com halteres', equipamento: 'Halteres', observacoes: 'Joelhos na linha dos pés, desça até coxas paralelas ao chão. Elástico acima dos joelhos ativa mais o glúteo.', imagem: 'images/agachamento.gif', video: null },
     { id: 'B-2', grupo: 'Pernas', exercicio: 'Avanço com halteres', equipamento: 'Halteres e peso de tornozelo', observacoes: 'Passo largo, joelho da frente a 90°. Não deixe o joelho passar da ponta do pé.', imagem: 'images/avancamento.gif', video: null },
     { id: 'B-4', grupo: 'Glúteo', exercicio: 'Elevação pélvica', equipamento: 'Halteres e peso de perna', observacoes: 'Pés no chão, empurre o quadril para cima e contraia o glúteo no topo. Uma perna ou duas.', imagem: 'images/elevacao-pelvica.gif', video: null },
@@ -25,6 +27,7 @@ const ROTINA = {
     { id: 'B-prancha', grupo: 'Core', exercicio: 'Prancha', equipamento: 'Colchonete', observacoes: 'Cabeça, quadril e tornozelos alinhados. Contraia o abdômen e não deixe o quadril subir ou cair.', imagem: 'https://cdn.atletis.com.br/atletis-website/base/82e/95c/164/abdominal-prancha-frontal.png', video: 'videos/Prancha Correção.webm' },
   ],
   C: [
+    { id: 'C-alongamento', grupo: 'Alongamento', exercicio: 'Alongamento', equipamento: 'Sem equipamento', observacoes: 'Faça um aquecimento leve e alongue sem dor. Respire fundo e mantenha 20–30s cada posição.', imagem: 'https://www.soufisio.com.br/wp-content/uploads/2018/06/alongamentos-dicas.png', video: null, pinnedFirst: true },
     { id: 'C-1', grupo: 'Costas', exercicio: 'Barra fixa', equipamento: 'Barra de porta', observacoes: 'Pegada aberta (costas) ou supinada (bíceps). Suba até o queixo passar da barra, desça controlado.', imagem: 'images/barrafixa.gif', video: 'videos/Barra fixa não é só força.webm' },
     { id: 'C-3', grupo: 'Bíceps', exercicio: 'Rosca direta alternada', equipamento: 'Halteres', observacoes: 'Cotovelos fixos ao lado do corpo. Suba e desça com controle, sem balançar.', imagem: 'images/rosca-direta.gif', video: null },
     { id: 'C-4', grupo: 'Ombro', exercicio: 'Elevação lateral', equipamento: 'Halteres', observacoes: 'Levante até a altura dos ombros, cotovelos levemente flexionados. Não impulsione com o corpo.', imagem: 'images/elevacao-lateral.gif', video: null },
@@ -38,6 +41,7 @@ const ROTINA = {
     { id: 'C-prancha', grupo: 'Core', exercicio: 'Prancha', equipamento: 'Colchonete', observacoes: 'Cabeça, quadril e tornozelos alinhados. Contraia o abdômen e não deixe o quadril subir ou cair.', imagem: 'https://cdn.atletis.com.br/atletis-website/base/82e/95c/164/abdominal-prancha-frontal.png', video: 'videos/Prancha Correção.webm' },
   ],
   cardio: [
+    { id: 'cardio-alongamento', grupo: 'Alongamento', exercicio: 'Alongamento', equipamento: 'Sem equipamento', observacoes: 'Faça um aquecimento leve e alongue sem dor. Respire fundo e mantenha 20–30s cada posição.', imagem: 'https://www.soufisio.com.br/wp-content/uploads/2018/06/alongamentos-dicas.png', video: null, pinnedFirst: true },
     { id: 'cardio-prancha', grupo: 'Core', exercicio: 'Prancha', equipamento: 'Colchonete', observacoes: 'Cabeça, quadril e tornozelos alinhados. Contraia o abdômen e não deixe o quadril subir ou cair.', imagem: 'https://cdn.atletis.com.br/atletis-website/base/82e/95c/164/abdominal-prancha-frontal.png', video: 'videos/Prancha Correção.webm' },
     { id: 'cardio-1', grupo: 'Cardio', exercicio: 'Corrida', equipamento: 'Tênis / esteira ou rua', observacoes: 'Ritmo em que consiga falar. Aqueça 5 min e alongue ao final.', imagem: 'https://i.giphy.com/1iTH1WIUjM0VATSw.gif', video: null },
     { id: 'cardio-2', grupo: 'Cardio', exercicio: 'Bike', equipamento: 'Bicicleta ergométrica ou externa', observacoes: 'Resistência que exija esforço sem perder o fôlego. Ajuste o banco na altura do quadril.', imagem: 'https://media.tenor.com/p_uI2cRfjMoAAAAM/mr-bean-holiday-mister-bean-holiday.gif', video: null },

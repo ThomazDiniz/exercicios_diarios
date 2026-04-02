@@ -12,34 +12,45 @@
 <body>
   <div class="app">
     <header class="header">
-      <h1>Rotina de Treino</h1>
+      <div class="header-top">
+        <div class="header-clock" aria-label="Hora atual">
+          <span class="header-clock-label">Hora</span>
+          <span class="header-clock-value" id="header-clock">00:00:00</span>
+        </div>
+        <h1>Rotina de Treino</h1>
+        <div class="header-timer" aria-label="Cronômetro do treino">
+          <span class="header-timer-label">Tempo</span>
+          <span class="header-timer-value" id="header-timer">00:00</span>
+          <button type="button" class="header-timer-reset" id="header-timer-reset" aria-label="Reiniciar cronômetro" title="Reiniciar">↺</button>
+        </div>
+      </div>
       <div class="day-tabs" role="tablist">
         <button type="button" class="tab active" data-treino="A" aria-selected="true">Treino A — Peito & Tríceps</button>
         <button type="button" class="tab" data-treino="B" aria-selected="false">Treino B — Pernas</button>
         <button type="button" class="tab" data-treino="C" aria-selected="false">Treino C — Costas & Ombros</button>
         <button type="button" class="tab" data-treino="cardio" aria-selected="false">Cardio</button>
+        <button type="button" class="tips-toggle" id="tips-toggle" aria-controls="videos-legais" aria-expanded="true">Ocultar dicas</button>
       </div>
       <section class="videos-legais" id="videos-legais" aria-label="Dicas">
-        <h2 class="videos-legais-title">Dicas</h2>
+        <div class="videos-legais-header">
+          <h2 class="videos-legais-title">Dicas</h2>
+          <button type="button" class="videos-legais-close" id="videos-legais-close" aria-label="Fechar dicas" title="Fechar dicas">×</button>
+        </div>
         <div class="videos-legais-grid" id="videos-legais-grid"></div>
       </section>
     </header>
 
     <main class="main">
       <section id="treino-A" class="treino-panel active" aria-hidden="false">
-        <h2>Treino A — Peito e Tríceps</h2>
         <div id="exercises-A" class="exercises-grid"></div>
       </section>
       <section id="treino-B" class="treino-panel" aria-hidden="true">
-        <h2>Treino B — Pernas e Posterior</h2>
         <div id="exercises-B" class="exercises-grid"></div>
       </section>
       <section id="treino-C" class="treino-panel" aria-hidden="true">
-        <h2>Treino C — Costas, Bíceps e Ombros</h2>
         <div id="exercises-C" class="exercises-grid"></div>
       </section>
       <section id="treino-cardio" class="treino-panel" aria-hidden="true">
-        <h2>Cardio — Corrida ou Bike</h2>
         <div id="exercises-cardio" class="exercises-grid"></div>
       </section>
     </main>

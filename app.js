@@ -8,6 +8,100 @@
   var lastSelectionByTreino = { A: null, B: null, C: null, cardio: null };
   var congratsCloseTimer = null;
   var CONGRATS_MS = 3000;
+  var headerTimerInterval = null;
+  var headerTimerStartedAt = Date.now();
+  var headerTimerAccumulatedMs = 0;
+  var headerClockInterval = null;
+
+  function formatElapsed(ms) {
+    var totalSec = Math.max(0, Math.floor(ms / 1000));
+    var h = Math.floor(totalSec / 3600);
+    var m = Math.floor((totalSec % 3600) / 60);
+    var s = totalSec % 60;
+    if (h > 0) return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+  }
+
+  function updateHeaderTimer() {
+    var el = document.getElementById('header-timer');
+    if (!el) return;
+    var runningMs = Date.now() - headerTimerStartedAt;
+    el.textContent = formatElapsed(headerTimerAccumulatedMs + runningMs);
+  }
+
+  function startHeaderTimer() {
+    if (headerTimerInterval) return;
+    headerTimerStartedAt = Date.now();
+    updateHeaderTimer();
+    headerTimerInterval = setInterval(updateHeaderTimer, 1000);
+  }
+
+  function pauseHeaderTimer() {
+    if (!headerTimerInterval) return;
+    clearInterval(headerTimerInterval);
+    headerTimerInterval = null;
+    headerTimerAccumulatedMs += (Date.now() - headerTimerStartedAt);
+    updateHeaderTimer();
+  }
+
+  function updateHeaderClock() {
+    var el = document.getElementById('header-clock');
+    if (!el) return;
+    var now = new Date();
+    var hh = String(now.getHours()).padStart(2, '0');
+    var mm = String(now.getMinutes()).padStart(2, '0');
+    var ss = String(now.getSeconds()).padStart(2, '0');
+    el.textContent = hh + ':' + mm + ':' + ss;
+  }
+
+  function startHeaderClock() {
+    if (headerClockInterval) return;
+    updateHeaderClock();
+    headerClockInterval = setInterval(updateHeaderClock, 1000);
+  }
+
+  function pauseHeaderClock() {
+    if (!headerClockInterval) return;
+    clearInterval(headerClockInterval);
+    headerClockInterval = null;
+  }
+
+  function resetHeaderTimer() {
+    headerTimerAccumulatedMs = 0;
+    headerTimerStartedAt = Date.now();
+    updateHeaderTimer();
+  }
+
+  function dismissTips() {
+    var tips = document.getElementById('videos-legais');
+    if (tips) tips.classList.add('is-dismissed');
+  }
+
+  function showTips() {
+    var tips = document.getElementById('videos-legais');
+    if (tips) tips.classList.remove('is-dismissed');
+  }
+
+  function updateTipsToggleUi() {
+    var btn = document.getElementById('tips-toggle');
+    var tips = document.getElementById('videos-legais');
+    if (!btn || !tips) return;
+    var dismissed = tips.classList.contains('is-dismissed');
+    btn.textContent = dismissed ? 'Mostrar dicas' : 'Ocultar dicas';
+    btn.setAttribute('aria-expanded', dismissed ? 'false' : 'true');
+  }
+
+  function restoreTipsState() {
+    var tips = document.getElementById('videos-legais');
+    // Por padrão, as Dicas sempre começam abertas ao carregar a página.
+    if (tips) tips.classList.remove('is-dismissed');
+  }
+
+  function shouldDismissTipsOnEnter() {
+    var tips = document.getElementById('videos-legais');
+    if (!tips) return false;
+    return !tips.classList.contains('is-dismissed');
+  }
 
   function getDateKey() {
     var d = new Date();
@@ -43,7 +137,14 @@
     var out = [];
     order.forEach(function (id) { if (map[id]) out.push(map[id]); });
     list.forEach(function (ex) { if (!order.includes(ex.id)) out.push(ex); });
-    return out;
+    // Itens "pinnedFirst" devem ficar sempre no topo (mesmo com ordem salva antiga).
+    var pinned = [];
+    var rest = [];
+    out.forEach(function (ex) {
+      if (ex && ex.pinnedFirst) pinned.push(ex);
+      else rest.push(ex);
+    });
+    return pinned.concat(rest);
   }
 
   function loadDoneState() {
@@ -92,10 +193,12 @@
     card.className = 'exercise-card';
     card.dataset.id = ex.id;
     card.dataset.treino = treino;
-    card.draggable = true;
+    card.draggable = !ex.pinnedFirst;
     card.innerHTML =
       '<div class="exercise-card-header">' +
-        '<div class="drag-handle" draggable="false" role="button" tabindex="0" aria-label="Reordenar exercício" title="Arraste para reordenar">⋮⋮</div>' +
+        (ex.pinnedFirst
+          ? '<div class="drag-handle drag-handle-disabled" aria-hidden="true" title="Fixado no topo">📌</div>'
+          : '<div class="drag-handle" draggable="false" role="button" tabindex="0" aria-label="Reordenar exercício" title="Arraste para reordenar">⋮⋮</div>') +
         '<div class="exercise-thumb-wrap"><img class="exercise-thumb" src="' + imgSrc + '" alt="' + escapeHtml(ex.exercicio) + '" loading="lazy" draggable="false"></div>' +
         '<div class="exercise-info">' +
           '<p class="exercise-grupo">' + escapeHtml(ex.grupo) + '</p>' +
@@ -541,7 +644,11 @@
     switchPanel(getTreinoDoDia());
     applySavedState();
     renderVideosLegais();
+    restoreTipsState();
+    updateTipsToggleUi();
     ensureSelectionInActivePanel();
+    startHeaderTimer();
+    startHeaderClock();
 
     var overlay = document.getElementById('image-zoom-overlay');
     if (overlay) {
@@ -608,6 +715,11 @@
 
       if (e.key === 'Enter') {
         e.preventDefault();
+        if (shouldDismissTipsOnEnter()) {
+          dismissTips();
+          updateTipsToggleUi();
+          return;
+        }
         markSelectedDone();
         return;
       }
@@ -627,6 +739,42 @@
         }
       }
     });
+
+    var tipsClose = document.getElementById('videos-legais-close');
+    if (tipsClose) {
+      tipsClose.addEventListener('click', function () {
+        dismissTips();
+        updateTipsToggleUi();
+      });
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        pauseHeaderTimer();
+        pauseHeaderClock();
+      } else {
+        startHeaderTimer();
+        startHeaderClock();
+      }
+    });
+
+    var headerTimerReset = document.getElementById('header-timer-reset');
+    if (headerTimerReset) {
+      headerTimerReset.addEventListener('click', function () {
+        resetHeaderTimer();
+      });
+    }
+    }
+
+    var tipsToggle = document.getElementById('tips-toggle');
+    if (tipsToggle) {
+      tipsToggle.addEventListener('click', function () {
+        var tips = document.getElementById('videos-legais');
+        if (!tips) return;
+        if (tips.classList.contains('is-dismissed')) showTips();
+        else dismissTips();
+        updateTipsToggleUi();
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
