@@ -724,6 +724,12 @@
         return;
       }
 
+      if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        resetHeaderTimer();
+        return;
+      }
+
       if (e.key === 'Backspace' || e.key === 'z' || e.key === 'Z') {
         var doneCards = panel.querySelectorAll('.exercise-card.done');
         if (doneCards.length === 0) return;
