@@ -12,23 +12,24 @@
 <body>
   <div class="app">
     <header class="header">
-      <div class="header-top">
+      <div class="header-bar">
         <div class="header-clock" aria-label="Hora atual">
           <span class="header-clock-label">Hora</span>
           <span class="header-clock-value" id="header-clock">00:00:00</span>
         </div>
-        <h1>Rotina de Treino</h1>
+        <label for="treino-select" class="visually-hidden">Treino</label>
+        <select id="treino-select" class="treino-select" aria-label="Selecionar treino">
+          <option value="A">Treino A — Peito &amp; Tríceps</option>
+          <option value="B">Treino B — Pernas</option>
+          <option value="C">Treino C — Costas &amp; Ombros</option>
+          <option value="cardio">Cardio</option>
+        </select>
+        <h1 class="header-title">Rotina de Treino</h1>
         <div class="header-timer" aria-label="Cronômetro do treino">
           <span class="header-timer-label">Tempo</span>
           <span class="header-timer-value" id="header-timer">00:00</span>
           <button type="button" class="header-timer-reset" id="header-timer-reset" aria-label="Reiniciar cronômetro" title="Reiniciar">↺</button>
         </div>
-      </div>
-      <div class="day-tabs" role="tablist">
-        <button type="button" class="tab active" data-treino="A" aria-selected="true">Treino A — Peito & Tríceps</button>
-        <button type="button" class="tab" data-treino="B" aria-selected="false">Treino B — Pernas</button>
-        <button type="button" class="tab" data-treino="C" aria-selected="false">Treino C — Costas & Ombros</button>
-        <button type="button" class="tab" data-treino="cardio" aria-selected="false">Cardio</button>
         <button type="button" class="tips-toggle" id="tips-toggle" aria-controls="videos-legais" aria-expanded="true">Ocultar dicas</button>
       </div>
       <section class="videos-legais" id="videos-legais" aria-label="Dicas">

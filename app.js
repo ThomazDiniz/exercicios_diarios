@@ -2,9 +2,7 @@
   'use strict';
 
   var STORAGE_KEY = 'treino-done';
-  var ORDER_KEY = 'treino-order';
   var SELECTED_CLASS = 'selected';
-  var draggedCard = null;
   var lastSelectionByTreino = { A: null, B: null, C: null, cardio: null };
   var congratsCloseTimer = null;
   var CONGRATS_MS = 3000;
@@ -113,34 +111,10 @@
     return i >= 0 ? id.slice(0, i) : id;
   }
 
-  function loadOrder() {
-    try {
-      var raw = localStorage.getItem(ORDER_KEY);
-      return raw ? JSON.parse(raw) : null;
-    } catch (e) { return null; }
-  }
-
-  function saveOrder(data) {
-    try {
-      localStorage.setItem(ORDER_KEY, JSON.stringify(data));
-    } catch (e) {}
-  }
-
-  function getOrderedList(treinoKey, list) {
-    var data = loadOrder() || {};
-    var order = Array.isArray(data[treinoKey]) ? data[treinoKey] : null;
-    if (!order || order.length === 0) return list.slice();
-
-    var map = {};
-    list.forEach(function (ex) { map[ex.id] = ex; });
-
-    var out = [];
-    order.forEach(function (id) { if (map[id]) out.push(map[id]); });
-    list.forEach(function (ex) { if (!order.includes(ex.id)) out.push(ex); });
-    // Itens "pinnedFirst" devem ficar sempre no topo (mesmo com ordem salva antiga).
+  function getOrderedList(list) {
     var pinned = [];
     var rest = [];
-    out.forEach(function (ex) {
+    list.forEach(function (ex) {
       if (ex && ex.pinnedFirst) pinned.push(ex);
       else rest.push(ex);
     });
@@ -198,12 +172,8 @@
     card.className = 'exercise-card';
     card.dataset.id = ex.id;
     card.dataset.treino = treino;
-    card.draggable = !ex.pinnedFirst;
     card.innerHTML =
       '<div class="exercise-card-header">' +
-        (ex.pinnedFirst
-          ? '<div class="drag-handle drag-handle-disabled" aria-hidden="true" title="Fixado no topo">📌</div>'
-          : '<div class="drag-handle" draggable="false" role="button" tabindex="0" aria-label="Reordenar exercício" title="Arraste para reordenar">⋮⋮</div>') +
         '<div class="exercise-thumb-wrap"><img class="exercise-thumb" src="' + imgSrc + '" alt="' + escapeHtml(ex.exercicio) + '" loading="lazy" draggable="false"></div>' +
         '<div class="exercise-info">' +
           '<p class="exercise-grupo">' + escapeHtml(ex.grupo) + '</p>' +
@@ -234,9 +204,9 @@
         card.classList.toggle('done', this.checked);
         saveDoneState();
         if (this.checked) {
-          // se marcou, move seleção para o próximo disponível
+          // se marcou, move seleção para o próximo disponível (sem scroll: evita “pular” a página no mobile)
           if (card.classList.contains(SELECTED_CLASS)) {
-            selectNextAvailableInActivePanel();
+            selectNextAvailableInActivePanel(true);
           }
         }
         showCongratsIfDone();
@@ -247,43 +217,8 @@
     card.addEventListener('click', function (e) {
       // evita selecionar ao clicar no checkbox/links/botões
       var t = e.target;
-      if (t && (t.closest('a') || t.closest('button') || t.closest('label') || t.closest('.drag-handle'))) return;
+      if (t && (t.closest('a') || t.closest('button') || t.closest('label'))) return;
       selectCard(card);
-    });
-
-    // Drag & drop: só inicia pelo handle
-    card.addEventListener('dragstart', function (e) {
-      var handle = e.target && e.target.closest && e.target.closest('.drag-handle');
-      if (!handle) {
-        e.preventDefault();
-        return;
-      }
-      draggedCard = card;
-      try { e.dataTransfer.setData('text/plain', card.dataset.id || ''); } catch (err) {}
-      e.dataTransfer.effectAllowed = 'move';
-      card.classList.add('dragging');
-    });
-    card.addEventListener('dragend', function () {
-      card.classList.remove('dragging');
-      draggedCard = null;
-    });
-    card.addEventListener('dragover', function (e) {
-      if (!draggedCard || draggedCard === card) return;
-      if (card.classList.contains('done') || draggedCard.classList.contains('done')) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-    });
-    card.addEventListener('drop', function (e) {
-      if (!draggedCard || draggedCard === card) return;
-      if (card.classList.contains('done') || draggedCard.classList.contains('done')) return;
-      e.preventDefault();
-      var parent = card.parentElement;
-      if (!parent) return;
-      // insere o dragged antes/depois baseado no mouse
-      var rect = card.getBoundingClientRect();
-      var before = e.clientY < rect.top + rect.height / 2;
-      parent.insertBefore(draggedCard, before ? card : card.nextSibling);
-      persistOrderForTreino(draggedCard.dataset.treino, parent);
     });
 
     var wrap = card.querySelector('.exercise-thumb-wrap');
@@ -481,7 +416,7 @@
     selectCard(chosen);
   }
 
-  function selectCard(card) {
+  function selectCard(card, skipScroll) {
     if (!card || card.classList.contains('done')) return;
     var panel = card.closest('.treino-panel');
     if (!panel) return;
@@ -489,7 +424,9 @@
     card.classList.add(SELECTED_CLASS);
     var treinoKey = getActiveTreinoKey();
     if (treinoKey) lastSelectionByTreino[treinoKey] = card.dataset.id || null;
-    try { card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    if (!skipScroll) {
+      try { card.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch (e) {}
+    }
   }
 
   function moveSelection(delta) {
@@ -503,12 +440,12 @@
     selectCard(next);
   }
 
-  function selectNextAvailableInActivePanel() {
+  function selectNextAvailableInActivePanel(skipScroll) {
     var panel = document.querySelector('.treino-panel.active');
     if (!panel) return;
     var cards = getSelectableCards(panel);
     if (cards.length === 0) return;
-    selectCard(cards[0]);
+    selectCard(cards[0], skipScroll);
   }
 
   function markSelectedDone() {
@@ -526,38 +463,8 @@
       current.classList.add('done');
       saveDoneState();
       showCongratsIfDone();
-      selectNextAvailableInActivePanel();
+      selectNextAvailableInActivePanel(true);
     }
-  }
-
-  function persistOrderForTreino(treinoKey, container) {
-    if (!treinoKey || !container) return;
-    var ids = [];
-    container.querySelectorAll('.exercise-card').forEach(function (card) {
-      if (card.dataset && card.dataset.id) ids.push(card.dataset.id);
-    });
-    var data = loadOrder() || {};
-    data[treinoKey] = ids;
-    saveOrder(data);
-  }
-
-  /** Permite soltar no grid (áreas vazias) e mantém dragover válido em toda a lista. */
-  function bindGridDragZone(container, treinoKey) {
-    if (!container) return;
-    container.addEventListener('dragover', function (e) {
-      if (!draggedCard || draggedCard.dataset.treino !== treinoKey) return;
-      if (draggedCard.classList.contains('done')) return;
-      e.preventDefault();
-      e.dataTransfer.dropEffect = 'move';
-    });
-    container.addEventListener('drop', function (e) {
-      if (!draggedCard || draggedCard.dataset.treino !== treinoKey) return;
-      if (draggedCard.classList.contains('done')) return;
-      if (e.target !== container) return;
-      e.preventDefault();
-      container.appendChild(draggedCard);
-      persistOrderForTreino(treinoKey, container);
-    });
   }
 
   function renderTreino(treinoKey) {
@@ -565,11 +472,10 @@
     const container = document.getElementById('exercises-' + treinoKey);
     if (!list || !container) return;
     container.innerHTML = '';
-    var ordered = getOrderedList(treinoKey, list);
+    var ordered = getOrderedList(list);
     ordered.forEach(function (ex) {
       container.appendChild(renderExercise(treinoKey, ex));
     });
-    bindGridDragZone(container, treinoKey);
   }
 
   function switchPanel(activeKey) {
@@ -580,12 +486,8 @@
       panel.classList.toggle('active', isActive);
       panel.setAttribute('aria-hidden', !isActive);
     });
-    document.querySelectorAll('.tab').forEach(function (tab) {
-      const key = tab.getAttribute('data-treino');
-      const isActive = key === activeKey;
-      tab.classList.toggle('active', isActive);
-      tab.setAttribute('aria-selected', isActive);
-    });
+    var treinoSelect = document.getElementById('treino-select');
+    if (treinoSelect) treinoSelect.value = activeKey;
   }
 
   function getTreinoDoDia() {
@@ -681,12 +583,13 @@
       });
     }
 
-    document.querySelectorAll('.tab').forEach(function (tab) {
-      tab.addEventListener('click', function () {
-        switchPanel(this.getAttribute('data-treino'));
+    var treinoSelectEl = document.getElementById('treino-select');
+    if (treinoSelectEl) {
+      treinoSelectEl.addEventListener('change', function () {
+        switchPanel(this.value);
         ensureSelectionInActivePanel();
       });
-    });
+    }
 
     var resetBtn = document.getElementById('reset-day');
     if (resetBtn) {
