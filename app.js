@@ -144,6 +144,11 @@
       if (ex && ex.pinnedFirst) pinned.push(ex);
       else rest.push(ex);
     });
+    pinned.sort(function (a, b) {
+      var ra = typeof a.pinnedRank === 'number' ? a.pinnedRank : 999;
+      var rb = typeof b.pinnedRank === 'number' ? b.pinnedRank : 999;
+      return ra - rb;
+    });
     return pinned.concat(rest);
   }
 
