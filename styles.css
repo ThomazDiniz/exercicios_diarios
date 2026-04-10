@@ -67,6 +67,32 @@ body {
   min-width: 0;
   max-width: min(300px, 32vw);
 }
+.treino-nav-btn {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.treino-nav-btn:hover {
+  background: var(--surface-2);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.treino-nav-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
 .header-title {
   flex: 1 1 auto;
   min-width: 0;
@@ -582,6 +608,10 @@ body {
   }
   .header-bar .treino-select {
     max-width: 200px;
+  }
+  .treino-nav-btn {
+    width: 32px;
+    height: 32px;
   }
   .header-title {
     flex: 0 0 auto;
