@@ -498,6 +498,16 @@
     return 'C';
   }
 
+  function switchRelativeTreino(delta) {
+    var order = ['A', 'B', 'C', 'cardio'];
+    var current = getActiveTreinoKey() || getTreinoDoDia();
+    var idx = order.indexOf(current);
+    if (idx < 0) idx = 0;
+    var next = (idx + delta + order.length) % order.length;
+    switchPanel(order[next]);
+    ensureSelectionInActivePanel();
+  }
+
   function isAllDoneInActivePanel() {
     var panel = document.querySelector('.treino-panel.active');
     if (!panel) return false;
@@ -588,6 +598,18 @@
       treinoSelectEl.addEventListener('change', function () {
         switchPanel(this.value);
         ensureSelectionInActivePanel();
+      });
+    }
+    var treinoPrev = document.getElementById('treino-prev');
+    if (treinoPrev) {
+      treinoPrev.addEventListener('click', function () {
+        switchRelativeTreino(-1);
+      });
+    }
+    var treinoNext = document.getElementById('treino-next');
+    if (treinoNext) {
+      treinoNext.addEventListener('click', function () {
+        switchRelativeTreino(1);
       });
     }
 
