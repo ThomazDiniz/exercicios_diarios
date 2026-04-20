@@ -6,7 +6,7 @@ App simples para acompanhar a rotina de treino (Treino A, B, C e Cardio), com ch
 
 ## Estrutura
 
-- **Treino A** — Peito e Tríceps  
+- **Treino A** — Peito, Tríceps e Ombro  
 - **Treino B** — Pernas e posterior  
 - **Treino C** — Costas, Bíceps e Ombros  
 - **Cardio** — Corrida ou bike  
