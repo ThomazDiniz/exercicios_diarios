@@ -10,6 +10,7 @@
   var headerTimerStartedAt = Date.now();
   var headerTimerAccumulatedMs = 0;
   var headerClockInterval = null;
+  var deferredInstallPrompt = null;
 
   function formatElapsed(ms) {
     var totalSec = Math.max(0, Math.floor(ms / 1000));
@@ -556,6 +557,74 @@
     }
   }
 
+  function registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('./sw.js').catch(function () {
+        // Falha de registro nao deve quebrar o app.
+      });
+    });
+  }
+
+  function isStandaloneMode() {
+    var iosStandalone = !!window.navigator.standalone;
+    var mediaStandalone = window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    return iosStandalone || mediaStandalone;
+  }
+
+  function isMobileDevice() {
+    var ua = navigator.userAgent || '';
+    return /Android|iPhone|iPad|iPod/i.test(ua);
+  }
+
+  function isIosSafari() {
+    var ua = navigator.userAgent || '';
+    var isIOS = /iPhone|iPad|iPod/i.test(ua);
+    var isWebKit = /WebKit/i.test(ua);
+    var isOtherBrowser = /CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua);
+    return isIOS && isWebKit && !isOtherBrowser;
+  }
+
+  function updateInstallButtonVisibility() {
+    var btn = document.getElementById('install-app');
+    if (!btn) return;
+    var canInstallByPrompt = !!deferredInstallPrompt;
+    var shouldShow = isMobileDevice() && !isStandaloneMode() && (canInstallByPrompt || isIosSafari());
+    btn.hidden = !shouldShow;
+  }
+
+  function setupInstallPrompt() {
+    var btn = document.getElementById('install-app');
+    if (!btn) return;
+
+    updateInstallButtonVisibility();
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      updateInstallButtonVisibility();
+    });
+
+    window.addEventListener('appinstalled', function () {
+      deferredInstallPrompt = null;
+      updateInstallButtonVisibility();
+    });
+
+    btn.addEventListener('click', async function () {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt();
+        try { await deferredInstallPrompt.userChoice; } catch (e) {}
+        deferredInstallPrompt = null;
+        updateInstallButtonVisibility();
+        return;
+      }
+
+      if (isIosSafari()) {
+        alert('Para instalar no iPhone:\n1) Toque em Compartilhar no Safari.\n2) Toque em Adicionar a Tela de Inicio.\n3) Confirme em Adicionar.');
+      }
+    });
+  }
+
   function init() {
     ['A', 'B', 'C', 'cardio'].forEach(renderTreino);
     switchPanel(getTreinoDoDia());
@@ -566,6 +635,8 @@
     ensureSelectionInActivePanel();
     startHeaderTimer();
     startHeaderClock();
+    registerServiceWorker();
+    setupInstallPrompt();
 
     var overlay = document.getElementById('image-zoom-overlay');
     if (overlay) {

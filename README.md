@@ -52,3 +52,13 @@ O script gera o `.webm` na mesma pasta do `.mp4`. Atualize os caminhos em `data.
 ## Uso
 
 Abra `index.html` no navegador. O progresso (checklist "Feito") é salvo no navegador (localStorage).
+
+## Instalar como app (PWA)
+
+O projeto agora pode ser instalado direto pelo navegador, sem loja.
+
+- **Android/Chrome**: menu do navegador -> **Instalar app** ou **Adicionar a tela inicial**
+- **Desktop (Chrome/Edge)**: icone de instalacao na barra de endereco
+- **iPhone (Safari)**: **Compartilhar** -> **Adicionar a Tela de Inicio**
+
+Para desenvolvimento local, use um servidor simples (em vez de abrir direto por `file://`) para o Service Worker funcionar corretamente.
